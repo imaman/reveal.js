@@ -155,7 +155,7 @@ const arrs = locations.map(l => readOneDay(`zips/${l.loc}`, l.dir === 'before'))
 
 function renderOneDay(a) {
     return a.map(curr => 
-        `<section><div class="my-grid" class="stretch"><div>${curr.timestamp}</div><div><img style="width: 100%; height: 100%" data-src="days-in-the-life/${curr.image}"></div></div></section>`).join('\n')
+        `<section><div class="col">${curr.timestamp}</div><div class="col"><img class="stretch" data-src="days-in-the-life/${curr.image}"></div></section>`).join('\n')
 }
 
 const replacement = arrs.map(curr => `<section>${renderOneDay(curr)}</section>`).join('\n')
