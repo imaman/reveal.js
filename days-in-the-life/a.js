@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 
 
-function readOneDay(p, timestampPrecedsImage) {
+function readOneDay(p, timestampPrecedsImage, title) {
     const arr = []
 
     function findNext(s, startAt) {
@@ -69,7 +69,7 @@ function readOneDay(p, timestampPrecedsImage) {
             }
 
             if (curr == '12:15') {
-                arr[i].timestamp = '00:24'
+                arr[i].timestamp = '00:15'
                 console.log('Forced: ' + arr[i].timestamp)
                 continue
             }
@@ -141,24 +141,28 @@ function readOneDay(p, timestampPrecedsImage) {
 const base = fs.readFileSync('base.html', 'utf-8')
 
 const locations = [
-        { loc: 'lower-kerem', dir: 'before' }, 
-        { loc: 'upper-kerem', dir: 'before' },
-        { loc: 'tlv', dir: 'before' }, 
-        { loc: 'brookyln' }
+        { loc: 'lower-kerem', dir: 'before', title: 'יום בחיי כרם תחתון - קורא במוסף הארץ כדי להעביר את הצחצוח מהר יותר' },
+        { loc: 'upper-kerem', dir: 'before', title: 'יום בחיי כרם עליון - מחפש עתיד במגירות של המקרר' },
+        { loc: 'tlv', dir: 'before', title: 'יום בחיי נציגת סניף תל אביב - פרילאנס בעיר הפרילאנסרים' },
+        { loc: 'brookyln', title: 'יום בחיי סניף ברוקלין - אבל יש לנו גשם כל השנה' }
     ]
-const arrs = locations.map(l => readOneDay(`zips/${l.loc}`, l.dir === 'before'))
+const arrs = locations.map(l => readOneDay(`zips/${l.loc}`, l.dir === 'before', l.title))
 // const arr = readOneDay('zips/brookyln')
 
 // console.log(JSON.stringify(arr, null, 2))
 
 
 
-function renderOneDay(a) {
-    return a.map(curr => 
-        `<section>${curr.timestamp}<br><img class="stretch" data-src="days-in-the-life/${curr.image}"></section>`).join('\n')
+function renderOneDay(a, i) {
+    const t = locations[i].title.split(' - ')
+    const first = `<section><div style="font-size: 2em !important;">${t[0]}<br><br><br></div><div style="font-size: 1.5em !important;">"${t[1]}"</div></section>`
+    const images = a.map(curr => 
+        `<section><h1>${curr.timestamp}</h1><img class="stretch" data-src="days-in-the-life/${curr.image}"></section>`).join('\n')
+
+    return `${first}\n${images}`
 }
 
-const replacement = arrs.map(curr => `<section>${renderOneDay(curr)}</section>`).join('\n')
+const replacement = arrs.map((curr, i) => `<section>${renderOneDay(curr, i)}</section>`).join('\n')
 
 const output = base.replace('__YOUR_CONTENT_HERE__', replacement)
 
@@ -166,4 +170,6 @@ fs.writeFileSync('../index.html', output, 'utf-8')
 
 // console.log(s)
 // console.log('len=' + s.length)
+
+
 
